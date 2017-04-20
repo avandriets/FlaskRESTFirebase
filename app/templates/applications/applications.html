@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-lg-3">
+            {% if user %}
+                <h4>Your applications</h4>
+
+                {% if user %}
+                    <div class="btn-group" role="group" aria-label="...">
+                        <a class="btn btn-default" href="{{ url_for('oauth2.create_application') }}"
+                           role="button"><span class="glyphicon glyphicon-plus-sign"> Application</span></a>
+                    </div>
+                {% endif %}
+
+                <p></p>
+
+                <div class="list-group">
+                    {% for app_item in applications %}
+                        <a href="{{ url_for('oauth2.application_item',application_id=app_item.client_id) }}"
+                           class="list-group-item">
+                            {{ app_item.application_name }}
+                        </a>
+                    {% endfor %}
+                </div>
+
+            {% endif %}
+        </div>
+
+        <div class="col-lg-6">
+
+        </div>
+
+    </div>
+{% endblock %}

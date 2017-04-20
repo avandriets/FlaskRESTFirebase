@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+
+{% block script %}
+    <script src="https://www.gstatic.com/firebasejs/live/3.7/firebase.js"></script>
+    <script src="/static/js/config.js"></script>
+    <script src="https://cdn.firebase.com/libs/firebaseui/1.0.1/firebaseui.js"></script>
+    <link type="text/css" rel="stylesheet" href="https://cdn.firebase.com/libs/firebaseui/1.0.1/firebaseui.css"/>
+
+    <script type="text/javascript">
+        // FirebaseUI config.
+        var csrf_token = "{{ csrf_token() }}";
+        var uiConfig = {
+            // Url to redirect to after a successful sign-in.
+            'signInSuccessUrl': '/',
+            'callbacks': {
+                'signInSuccess': function (user, credential, redirectUrl) {
+
+                    user.getToken().then(function (token) {
+                        var xhr = new XMLHttpRequest();
+
+                        xhr.open("POST", "{{ firebase_auth.url_for('sign_in') }}", true);
+                        xhr.setRequestHeader("Content-Type", "application/jwt");
+                        xhr.setRequestHeader("X-CSRFToken", csrf_token);
+
+                        xhr.onreadystatechange = function () {
+                            console.log("On ready state change.");
+                            if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
+
+                                var obj = JSON.parse(xhr.responseText);
+
+                                //permit to access
+                                if (obj.response) {
+                                    document.getElementById("result").innerHTML = '</br>Login Successful! Redirecting...</br>';
+
+                                    if (window.opener) {
+                                        // The widget has been opened in a popup, so close the window
+                                        // and return false to not redirect the opener.
+                                        window.opener.location.replace(redirectUrl || "{{ request.url_root }}");
+                                        setTimeout(function () {
+                                            window.close();
+                                        }, 4000);
+                                        return false;
+                                    } else {
+                                        setTimeout(function () {
+                                            window.location.replace("/");
+                                        }, 4000);
+                                        // The widget has been used in redirect mode, so we redirect to the signInSuccessUrl.
+                                        return true;
+                                    }
+
+                                } else { // access denied from site
+
+                                    document.getElementById("result").innerHTML = '</br>You do not have permission to access the site.</br>';
+                                    firebase.auth().signOut();
+
+                                    if (window.opener) {
+                                        // The widget has been opened in a popup, so close the window
+                                        // and return false to not redirect the opener.
+                                        window.opener.location.replace("/");
+                                        setTimeout(function () {
+                                            window.close();
+                                        }, 4000);
+                                        return false;
+                                    } else {
+                                        setTimeout(function () {
+                                            window.location.replace("/");
+                                        }, 4000);
+                                        // The widget has been used in redirect mode, so we redirect to the signInSuccessUrl.
+                                        return true;
+                                    }
+                                }
+                            } else {
+                                //$('#result').html('Failed to make a server-side call. Check your configuration and console.');
+                            }
+                        };
+                        xhr.send(token);
+                    });
+                }
+            },
+            signInOptions: [{{ firebase_auth.provider_ids }}],
+            // Terms of service url.
+            'tosUrl': 'https://www.google.com'
+        };
+
+        // Initialize the FirebaseUI Widget using Firebase.
+        var ui = new firebaseui.auth.AuthUI(firebase.auth());
+        // The start method will wait until the DOM is loaded to include the FirebaseUI sign-in widget
+        // within the element corresponding to the selector specified.
+        ui.start('#firebaseui-auth-container', uiConfig);
+
+    </script>
+{% endblock %}
+
+{% block main_menu %}
+{% endblock %}
+
+{% block content %}
+    <div id="firebaseui-auth-container"></div>
+    <div id="result"></div>
+{% endblock %}

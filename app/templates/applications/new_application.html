@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <div class="row">
+        <h4>New application</h4>
+        <hr/>
+        <div class="col-lg-5">
+            <form method="post">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+
+                {% if error %}
+                    <div class="alert alert-danger" role="alert">
+                        <span class="glyphicon glyphicon-exclamation-sign"
+                              aria-hidden="true"></span>
+                        <span class="sr-only">Error:</span>
+                        {{ error }}
+                    </div>
+                {% endif %}
+
+                <div class="form-group">
+                    <label for="id_name">Application name</label>
+                    <input class="form-control" id="id_name" type="text" name="name" value="{{ name }}"/>
+                </div>
+
+                <div class="form-group">
+                    <label for="id_description">Description</label>
+                    <textarea class="form-control" id="id_description" name="description" rows="2">{{ description }}</textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="id_client_id">client id</label>
+                    <input class="form-control" id="id_client_id" type="text" name="client_id" value="{{ client_id }}"/>
+                </div>
+
+                <div class="form-group">
+                    <label for="id_client_secret">client secret</label>
+                    <input class="form-control" id="id_client_secret" type="text" name="client_secret" value="{{ client_secret }}"/>
+                </div>
+
+                <div class="form-group">
+                    <label for="id_redirect_uris">Redirect urls</label>
+                    <textarea class="form-control" id="id_redirect_uris" name="redirect_uris" rows="4">{{ redirect_uris }}</textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="id_default_scopes">Default scopes</label>
+                    <textarea class="form-control" id="id_default_scopes" name="default_scopes" rows="2">{{ default_scopes }}</textarea>
+                </div>
+
+                <div class="form-group">
+                    <input type="submit" value="Submit" class="btn btn-default"/>
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock %}

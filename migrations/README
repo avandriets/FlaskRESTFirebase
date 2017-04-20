@@ -1,0 +1,8 @@
+Generic single-database configuration.
+
+1. EnvFlaskFirebase/bin/python3 manage.py db init
+2. EnvFlaskFirebase/bin/python3 manage.py db upgrade
+3. EnvFlaskFirebase/bin/python3 manage.py db migrate
+
+
+EnvFlaskFirebase/bin/python3 manage.py db --help

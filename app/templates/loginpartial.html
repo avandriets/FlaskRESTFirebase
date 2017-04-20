@@ -1,0 +1,9 @@
+<ul class="nav navbar-nav navbar-right">
+    <button id="sign-in-with-popup" type="button" class="btn btn-default navbar-btn">Sign in</button>
+    {% if user %}
+        <li id="email" class="hidden"><a href="\">{{ user.email }}</a></li>
+    {% else %}
+        <li id="email" class="hidden"><a href="\"></a></li>
+    {% endif %}
+    <button id="sign-out" type="button" class="btn btn-default navbar-btn hidden">Sign Out</button>
+</ul>

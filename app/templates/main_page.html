@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block script %}
+    <script src="https://www.gstatic.com/firebasejs/3.7.8/firebase.js"></script>
+    <script type="text/javascript" src="/static/js/config.js"></script>
+{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-lg-9">
+
+        </div>
+
+        <div class="col-lg-3">
+            {% if not user %}
+                <div id="firebaseui-auth-container"></div>
+            {% endif %}
+        </div>
+
+    </div>
+{% endblock %}
+
+{% block script_bottom %}
+    <script type="text/javascript" src="/static/js/app.js"></script>
+{% endblock %}
