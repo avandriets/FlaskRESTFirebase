@@ -50,20 +50,20 @@ access_token : [YOUR TOKEN]
 
 1. Initalization
 ```
-EnvFlaskFirebase/bin/python3 manage.py db init
+[env catalog]/bin/python3 manage.py db init
 ```
 
 2. Migrate
 ```
-EnvFlaskFirebase/bin/python3 manage.py db migrate
+[env catalog]/bin/python3 manage.py db migrate
 ```
 
 3. Update
 ```
-EnvFlaskFirebase/bin/python3 manage.py db upgrade
+[env catalog]/bin/python3 manage.py db upgrade
 ```
 
 4. Help
 ```
-EnvFlaskFirebase/bin/python3 manage.py db --help
+[env catalog]/bin/python3 manage.py db --help
 ```
