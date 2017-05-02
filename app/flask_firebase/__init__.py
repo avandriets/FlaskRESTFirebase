@@ -86,7 +86,6 @@ class FirebaseAuth(JwtParser):
         return render_template('firebase/widget.html', firebase_auth=self)
 
     def sign_in(self):
-        assert not self.debug
         try:
             token = self.parse_key(request.data, app=self.app)
         except:

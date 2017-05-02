@@ -3,7 +3,7 @@ import os
 # Statement for enabling the development environment
 DEBUG = False
 
-SITE_NAME = "Taxi service"
+SITE_NAME = "Flask firebase auth"
 
 # Define the application directory
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
@@ -28,7 +28,11 @@ CSRF_ENABLED = True
 CSRF_SESSION_KEY = "TLuUFarPdqHRlWikPvlMHiqy3oGIeutgYk5x5U8n"
 
 # Secret key for signing cookies
-SECRET_KEY = "PUT YOUR DATA HERE"
+SECRET_KEY = "TLuUFarPdqH12sxc434gggRlWikPvlMHiqy3oGIeutgYk5x5U8n"
 FIREBASE_API_KEY = "PUT YOUR DATA HERE"
 FIREBASE_PROJECT_ID = "PUT YOUR DATA HERE"
 FIREBASE_AUTH_SIGN_IN_OPTIONS = "email,google"
+
+# TODO change it for real database
+UPLOADED_PHOTOS_DEST = os.path.join(BASE_DIR, 'app/static/media')
+UPLOADED_PHOTOS_URL = "http://127.0.0.1:8000/static/media/"

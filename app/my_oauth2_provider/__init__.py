@@ -1,9 +1,10 @@
+import jwt
 from jwt import ExpiredSignatureError
 from datetime import timedelta, datetime
 from flask import Blueprint
 from flask_oauthlib.provider import OAuth2Provider
-from app import InvalidUsage
-from app.database import db_session
+from app.database import db
+from app.error_helper import InvalidUsage
 from app.jwt_parser import JwtParser
 from app.users_manager.models import current_user, Client, Grant, Token, User
 
@@ -31,8 +32,8 @@ class MyOauth2Provider(OAuth2Provider, JwtParser):
 
         # make sure that every client has only one token connected to a user
         for t in toks:
-            db_session.delete(t)
-            db_session.commit()
+            db.session.delete(t)
+            db.session.commit()
 
         expires_in = token.pop('expires_in')
         expires = datetime.utcnow() + timedelta(seconds=expires_in)
@@ -47,8 +48,8 @@ class MyOauth2Provider(OAuth2Provider, JwtParser):
             user_id=request.user.id,
         )
 
-        db_session.add(tok)
-        db_session.commit()
+        db.session.add(tok)
+        db.session.commit()
         return tok
 
     def _grantsetter(self, client_id, code, request, *args, **kwargs):
@@ -62,8 +63,8 @@ class MyOauth2Provider(OAuth2Provider, JwtParser):
             user=current_user(),
             expires=expires
         )
-        db_session.add(grant)
-        db_session.commit()
+        db.session.add(grant)
+        db.session.commit()
         return grant
 
     def _tokengetter(self, access_token=None, refresh_token=None):
@@ -73,13 +74,23 @@ class MyOauth2Provider(OAuth2Provider, JwtParser):
             return Token.query.filter_by(refresh_token=refresh_token).first()
 
     def _usergetter(self, username, password, client, request, *args, **kwargs):
-        token = request.jwt_token
-        try:
-            result = self.parse_key(token_data=token, app=self.app)
-        except ExpiredSignatureError:
-            raise InvalidUsage('Token expired', status_code=500)
+        if not hasattr(request, 'jwt_token'):
+            raise InvalidUsage('wrong parameter', status_code=500)
 
-        account = User.query.filter_by(firebase_user_id=result['sub']).one_or_none()
+        jwt_token = request.jwt_token
+
+        if self.app.config['TESTING']:
+            try:
+                token = jwt.decode(jwt_token, 'secret', algorithms=['HS256'])
+            except Exception:
+                raise InvalidUsage('JWT token decode problem', status_code=500)
+        else:
+            try:
+                token = self.parse_key(token_data=jwt_token, app=self.app)
+            except ExpiredSignatureError:
+                raise InvalidUsage('Token expired', status_code=500)
+
+        account = User.query.filter_by(firebase_user_id=token['sub']).one_or_none()
         if account is None:
             account = User(firebase_user_id=token['sub'])
             account.email = token['email']
@@ -87,8 +98,13 @@ class MyOauth2Provider(OAuth2Provider, JwtParser):
             account.name = token.get('name')
             account.photo_url = token.get('picture')
             account.admin_user = 0
-            db_session.add(account)
-            db_session.commit()
+            db.session.add(account)
+
+            from app.api.profile.models import Profile
+            profile = Profile(user=account)
+            db.session.add(profile)
+
+            db.session.commit()
 
         if account and account.blocked == 1:
             raise InvalidUsage('Access denied', status_code=403)
